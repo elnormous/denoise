@@ -1,6 +1,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sndfile.h>
 #include <rnnoise.h>
 
@@ -11,13 +12,12 @@ int main(int argc, char* argv[])
     SF_INFO sfinfo;
     SNDFILE* infile = NULL;
     SNDFILE* outfile = NULL;
-    sf_count_t num_items = 0;
     short* buffer = NULL;
-    float* tmp = NULL;
+    float* x = NULL;
     DenoiseState* st = NULL;
     int i;
-    int frame = 0;
-    int frame_size = 0;
+    sf_count_t frames_read = 0;
+    int rnn_frame_size = 0;
     int result = EXIT_SUCCESS;
 
     if (argc < 3)
@@ -47,11 +47,6 @@ int main(int argc, char* argv[])
         goto cleanup;
     }
 
-    num_items = sfinfo.frames * sfinfo.channels;
-    buffer = malloc((unsigned long)num_items * sizeof(short));
-
-    sf_read_short(infile, buffer, num_items);
-
     st = rnnoise_create(NULL);
     if (!st)
     {
@@ -60,24 +55,11 @@ int main(int argc, char* argv[])
         goto cleanup;
     }
 
-    frame_size = rnnoise_get_frame_size();
-    tmp = malloc((unsigned long)frame_size * sizeof(float));
+    rnn_frame_size = rnnoise_get_frame_size();
+    buffer = malloc((unsigned long)rnn_frame_size * sizeof(short));
+    x = malloc((unsigned long)rnn_frame_size * sizeof(float));
 
-    printf("Processing data\n");
-
-    for (frame = 0; frame * frame_size < num_items; ++frame)
-    {
-        for (i = 0; i < frame_size; ++i)
-            tmp[i] = frame * frame_size + i < num_items ? (float)buffer[frame * frame_size + i] : 0.0f;
-
-        rnnoise_process_frame(st, tmp, tmp);
-
-        for (i = 0; i < frame_size && frame * frame_size + i < num_items; ++i)
-            buffer[frame * frame_size + i] = (short)roundf(tmp[i]);
-    }
-
-    printf("Writing output file\n");
-
+    printf("Opening output file\n");
     outfile = sf_open(output_file, SFM_WRITE, &sfinfo);
 
     if (!outfile)
@@ -87,12 +69,30 @@ int main(int argc, char* argv[])
         goto cleanup;
     }
 
-    // Write the samples to output file
-    sf_write_short(outfile, buffer, num_items);
+    printf("Processing data\n");
+
+    for (;;)
+    {
+        memset(buffer, 0, (unsigned long)rnn_frame_size * sizeof(short));
+        frames_read = sf_read_short(infile, buffer, rnn_frame_size);
+
+        for (i = 0; i < rnn_frame_size; ++i)
+            x[i] = (float)buffer[i];
+
+        rnnoise_process_frame(st, x, x);
+
+        for (i = 0; i < rnn_frame_size; ++i)
+            buffer[i] = (short)roundf(x[i]);
+
+        sf_write_short(outfile, buffer, frames_read);
+
+        if (frames_read < rnn_frame_size)
+            break;
+    }
 
 cleanup:
     rnnoise_destroy(st);
-    free(tmp);
+    free(x);
     free(buffer);
     sf_close(outfile);
     sf_close(infile);
