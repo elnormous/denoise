@@ -35,29 +35,27 @@ int main(int argc, char* argv[])
 
     if (!infile)
     {
-        printf("Error opening input file\n");
+        fprintf(stderr, "Error opening input file\n");
         result = EXIT_FAILURE;
         goto cleanup;
     }
 
     if (sfinfo.channels != 1)
     {
-        printf("The input file must be mono\n");
+        fprintf(stderr, "The input file must be mono\n");
         result = EXIT_FAILURE;
         goto cleanup;
     }
 
-    // Allocate buffer for reading samples
     num_items = sfinfo.frames * sfinfo.channels;
     buffer = malloc((unsigned long)num_items * sizeof(short));
 
-    // Read the samples
     sf_read_short(infile, buffer, num_items);
 
     st = rnnoise_create(NULL);
     if (!st)
     {
-        printf("Failed to create rnnoise state\n");
+        fprintf(stderr, "Failed to create rnnoise state\n");
         result = EXIT_FAILURE;
         goto cleanup;
     }
@@ -84,7 +82,7 @@ int main(int argc, char* argv[])
 
     if (!outfile)
     {
-        printf("Error opening output file\n");
+        fprintf(stderr, "Error opening output file\n");
         result = EXIT_FAILURE;
         goto cleanup;
     }
