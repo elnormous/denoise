@@ -40,6 +40,13 @@ int main(int argc, char* argv[])
         goto cleanup;
     }
 
+    if (sfinfo.channels != 1)
+    {
+        printf("The input file must be mono\n");
+        result = EXIT_FAILURE;
+        goto cleanup;
+    }
+
     // Allocate buffer for reading samples
     num_items = sfinfo.frames * sfinfo.channels;
     buffer = malloc((unsigned long)num_items * sizeof(short));
