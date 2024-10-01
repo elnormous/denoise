@@ -90,14 +90,14 @@ int main(int argc, char* argv[])
             break;
     }
 
+    printf("WAV file processed successfully!\n");
+
 cleanup:
     rnnoise_destroy(st);
     free(x);
     free(buffer);
     sf_close(outfile);
     sf_close(infile);
-
-    printf("WAV file processed successfully!\n");
 
     return result;
 }
