@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -Wall -Wconversion -O2
 LDFLAGS = -lm -lsndfile -lrnnoise
 
-TARGET = denoize
+TARGET = denoise
 
 SRCS = main.c
 OBJS = $(SRCS:.c=.o)
