@@ -18,16 +18,20 @@ int main(int argc, char* argv[])
     int i;
     sf_count_t frames_read = 0;
     int rnn_frame_size = 0;
+    float strength = 1.0f;
     int result = EXIT_SUCCESS;
 
     if (argc < 3)
     {
-        printf("Usage: %s <input_file> <output_file>\n", argv[0]);
+        printf("Usage: %s <input_file> <output_file> [strength]\n", argv[0]);
         return EXIT_FAILURE;
     }
 
     input_file = argv[1];
     output_file = argv[2];
+    
+    if (argc >= 4)
+        strength = strtof(argv[3], NULL);
 
     printf("Reading input file\n");
 
@@ -82,7 +86,7 @@ int main(int argc, char* argv[])
         rnnoise_process_frame(st, x, x);
 
         for (i = 0; i < rnn_frame_size; ++i)
-            buffer[i] = (short)roundf(x[i]);
+            buffer[i] = (short)roundf(strength * x[i] + (1.0f - strength) * (float)buffer[i]);
 
         sf_write_short(outfile, buffer, frames_read);
 
