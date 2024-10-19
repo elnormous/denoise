@@ -21,9 +21,10 @@ int main(int argc, char* argv[])
     sf_count_t frames_read = 0;
     int rnn_frame_size = 0;
     float strength = 1.0f;
+    float gain = 1.0f;
     int result = EXIT_SUCCESS;
 
-    while ((opt = getopt(argc, argv, "i:o:s:")) != -1)
+    while ((opt = getopt(argc, argv, "i:o:s:g:")) != -1)
         switch (opt)
         {
             case 'i':
@@ -35,15 +36,18 @@ int main(int argc, char* argv[])
             case 's':
                 strength = strtof(optarg, NULL);
                 break;
+            case 'g':
+                gain = strtof(optarg, NULL);
+                break;
             default:
-                fprintf(stderr, "Usage: %s -i <input_file> -o <output_file> [-s strength]\n", argv[0]);
+                fprintf(stderr, "Usage: %s -i <input_file> -o <output_file> [-s strength] [-g gain]\n", argv[0]);
                 return 1;
         }
 
     if (input_file == NULL || output_file == NULL)
     {
         fprintf(stderr, "Error: Input and output files are required.\n");
-        fprintf(stderr, "Usage: %s -i <input_file> -o <output_file> [-s strength]\n", argv[0]);
+        fprintf(stderr, "Usage: %s -i <input_file> -o <output_file> [-s strength] [-g gain]\n", argv[0]);
         return EXIT_FAILURE;
     }
 
@@ -100,7 +104,7 @@ int main(int argc, char* argv[])
         rnnoise_process_frame(st, x, x);
 
         for (i = 0; i < rnn_frame_size; ++i)
-            buffer[i] = (short)roundf(strength * x[i] + (1.0f - strength) * (float)buffer[i]);
+            buffer[i] = (short)roundf((strength * x[i] + (1.0f - strength) * (float)buffer[i]) * gain);
 
         sf_write_short(outfile, buffer, frames_read);
 

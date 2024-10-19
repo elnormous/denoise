@@ -40,7 +40,7 @@ make
 The `denoise` tool can be used from the command line with the following syntax:
 
 ```bash
-./denoise -i <input_file> -o <output_file> [-s strength]
+./denoise -i <input_file> -o <output_file> [-s strength] [-g gain]
 ```
 
 - `<input_file>`: The input audio file that you want to denoise.
