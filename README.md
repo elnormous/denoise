@@ -61,7 +61,7 @@ To specify a custom strength:
 
 ## License
 
-This is free and unencumbered software released into the public domain.. See the [UNLICENSE](UNLICENSE) file for details.
+This is free and unencumbered software released into the public domain. See the [UNLICENSE](UNLICENSE) file for details.
 
 ## Contributing
 
