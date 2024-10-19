@@ -91,8 +91,8 @@ int main(int argc, char* argv[])
     }
 
     rnn_frame_size = rnnoise_get_frame_size();
-    buffer = malloc((unsigned long)rnn_frame_size * sizeof(short));
-    x = malloc((unsigned long)rnn_frame_size * sizeof(float));
+    buffer = malloc((size_t)rnn_frame_size * sizeof(short));
+    x = malloc((size_t)rnn_frame_size * sizeof(float));
 
     printf("Opening output file\n");
     outfile = sf_open(output_file, SFM_WRITE, &sfinfo);
@@ -108,7 +108,7 @@ int main(int argc, char* argv[])
 
     for (;;)
     {
-        memset(buffer, 0, (unsigned long)rnn_frame_size * sizeof(short));
+        memset(buffer, 0, (size_t)rnn_frame_size * sizeof(short));
         frames_read = sf_read_short(infile, buffer, rnn_frame_size);
 
         for (i = 0; i < rnn_frame_size; ++i)
