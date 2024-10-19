@@ -79,6 +79,9 @@ int main(int argc, char* argv[])
         goto cleanup;
     }
 
+    if (sfinfo.samplerate != 48000)
+        fprintf(stderr, "For best performance resample the file to 48kHz\n");
+
     st = rnnoise_create(NULL);
     if (!st)
     {
