@@ -2,11 +2,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include <sndfile.h>
 #include <rnnoise.h>
 
 int main(int argc, char* argv[])
 {
+    int opt;
     const char* input_file = NULL;
     const char* output_file = NULL;
     SF_INFO sfinfo;
@@ -21,17 +23,29 @@ int main(int argc, char* argv[])
     float strength = 1.0f;
     int result = EXIT_SUCCESS;
 
-    if (argc < 3)
+    while ((opt = getopt(argc, argv, "i:o:s:")) != -1)
+        switch (opt)
+        {
+            case 'i':
+                input_file = optarg;
+                break;
+            case 'o':
+                output_file = optarg;
+                break;
+            case 's':
+                strength = strtof(argv[3], NULL);
+                break;
+            default:
+                fprintf(stderr, "Usage: %s -i <input_file> -o <output_file> [-s strength]\n", argv[0]);
+                return 1;
+        }
+
+    if (input_file == NULL || output_file == NULL)
     {
-        printf("Usage: %s <input_file> <output_file> [strength]\n", argv[0]);
+        fprintf(stderr, "Error: Input and output files are required.\n");
+        fprintf(stderr, "Usage: %s -i <input_file> -o <output_file> [-s strength]\n", argv[0]);
         return EXIT_FAILURE;
     }
-
-    input_file = argv[1];
-    output_file = argv[2];
-    
-    if (argc >= 4)
-        strength = strtof(argv[3], NULL);
 
     printf("Reading input file\n");
 
