@@ -35,13 +35,23 @@ int main(int argc, char* argv[])
                 break;
             case 's':
                 strength = strtof(optarg, NULL);
+                if (strength < 0.0F || strength > 1.0F)
+                {
+                    fprintf(stderr, "Strength must be between 0.0 and 1.0\n");
+                    return EXIT_FAILURE;
+                }
                 break;
             case 'g':
                 gain = strtof(optarg, NULL);
+                if (gain < 0.0F)
+                {
+                    fprintf(stderr, "Gain must be positive\n");
+                    return EXIT_FAILURE;
+                }
                 break;
             default:
                 fprintf(stderr, "Usage: %s -i <input_file> -o <output_file> [-s strength] [-g gain]\n", argv[0]);
-                return 1;
+                return EXIT_FAILURE;
         }
 
     if (input_file == NULL || output_file == NULL)
