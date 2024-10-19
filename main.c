@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
                 output_file = optarg;
                 break;
             case 's':
-                strength = strtof(argv[3], NULL);
+                strength = strtof(optarg, NULL);
                 break;
             default:
                 fprintf(stderr, "Usage: %s -i <input_file> -o <output_file> [-s strength]\n", argv[0]);
