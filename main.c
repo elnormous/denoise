@@ -22,9 +22,10 @@ int main(int argc, char* argv[])
     int rnn_frame_size = 0;
     float strength = 1.0f;
     float gain = 1.0f;
+    char overwrite = 'n';
     int result = EXIT_SUCCESS;
 
-    while ((opt = getopt(argc, argv, "i:o:s:g:")) != -1)
+    while ((opt = getopt(argc, argv, "i:o:s:g:y")) != -1)
         switch (opt)
         {
             case 'i':
@@ -49,16 +50,34 @@ int main(int argc, char* argv[])
                     return EXIT_FAILURE;
                 }
                 break;
+            case 'y':
+                overwrite = 'y';
+                break;
             default:
-                fprintf(stderr, "Usage: %s -i <input_file> -o <output_file> [-s strength] [-g gain]\n", argv[0]);
+                fprintf(stderr, "Usage: %s -i <input_file> -o <output_file> [-s strength] [-g gain] [-y]\n", argv[0]);
                 return EXIT_FAILURE;
         }
 
     if (input_file == NULL || output_file == NULL)
     {
-        fprintf(stderr, "Error: Input and output files are required.\n");
-        fprintf(stderr, "Usage: %s -i <input_file> -o <output_file> [-s strength] [-g gain]\n", argv[0]);
+        fprintf(stderr, "Input and output files are required.\n");
+        fprintf(stderr, "Usage: %s -i <input_file> -o <output_file> [-s strength] [-g gain] [-y]\n", argv[0]);
         return EXIT_FAILURE;
+    }
+
+    if (access(input_file, F_OK) != 0)
+    {
+        fprintf(stderr, "Input file does exist.");
+        return EXIT_FAILURE;
+    }
+
+    if (overwrite != 'y' && access(output_file, F_OK) == 0)
+    {
+        fprintf(stderr, "Output file exists. Overwrite? [y/n] ");
+        overwrite = (char)getc(stdin);
+
+        if (overwrite != 'y')
+            return EXIT_SUCCESS;
     }
 
     printf("Reading input file\n");
